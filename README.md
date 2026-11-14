@@ -12,12 +12,6 @@
 
 ![GitHub Sponsors](https://img.shields.io/github/sponsors/andreibarburas?link=https://github.com/sponsors/andreibarburas)
 
-
-
-[![Get it on Google Play](https://img.shields.io/badge/Google%20Play-Download-brightgreen?logo=google-play&logoColor=white)](https://play.google.com/store/apps/dev?id=6842866278906089090)
-[![F-Droid](https://img.shields.io/badge/F--Droid-coming%20soon-blue?logo=f-droid)](https://f-droid.org)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-purple.svg)](LICENSE)
-
 ---
 
 Zaman is a free, open-source, privacy-first calendar client for Android. Your events, calendars, and reminders live entirely on your own Nextcloud, no third-party servers, no tracking, no ads.
