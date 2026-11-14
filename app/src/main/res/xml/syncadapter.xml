@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Feature #2 — contentAuthority is CalendarContract.AUTHORITY ("com.android.calendar"), the
+     shared system calendar provider every calendar app's sync adapter registers against.
+     userVisible="false": this adapter has no entry in Settings -> Accounts -> Zaman -> "Sync
+     Calendar" toggle of its own — CalendarContract sync is turned on/off from Zaman's own
+     Settings screen instead, via ZamanAccount.get()/remove(). -->
+<sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
+    android:contentAuthority="com.android.calendar"
+    android:accountType="com.brbrs.zaman"
+    android:userVisible="false"
+    android:supportsUploading="true"
+    android:isAlwaysSyncable="true"
+    android:allowParallelSyncs="false" />

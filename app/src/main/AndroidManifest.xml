@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Reminders use inexact AlarmManager alarms (setAndAllowWhileIdle) — no exact-alarm
+         permission needed, and no extra "allow exact alarms" settings-page detour for the user. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Feature #2 — CalendarContract two-way sync, only requested at runtime when the user
+         turns on Settings -> "Sync with Android Calendar"; declared here regardless, same as
+         every other runtime permission. -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+
+    <!-- Android 11+ (API 30) package-visibility: without this, PackageManager calls like
+         resolveActivity()/queryIntentActivities() silently return null/empty for another app's
+         intent-filter unless that other app happens to be visibility-exempt — which is why
+         openNavigationTo's old resolveActivity() check could appear to "work for Google Maps but
+         not Waze/HERE/OsmAnd" on a real device (Maps is commonly visibility-exempt, third-party
+         nav apps aren't). Declaring these <queries> restores visibility for the two implicit
+         intents Zaman actually probes/fires: geo: (get-directions, util/ExternalApps.kt) and any
+         app registered for vinci:// (the Vinci deep link, same file + EventEditScreen's
+         LinkedContactSection). Plain startActivity() with an implicit intent doesn't strictly
+         need this, but PackageManager introspection (resolveActivity) does — so this is required
+         for the pre-check path, and cheap insurance either way. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="geo" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="vinci" />
+        </intent>
+    </queries>
+
+    <application
+        android:name=".ZamanApp"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:theme="@style/Theme.Zaman">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Zaman">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Cross-app linking: lets Vinci/Tavla/Koto, the home-screen widget, and Search's
+                 own share action deep-link straight into Zaman's event-detail popup instead of
+                 just opening the app to Today. Handled by the NavHost's own navDeepLink on the
+                 event_detail route — Compose Navigation routes it from here without a second
+                 Activity. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="zaman" android:host="event" />
+            </intent-filter>
+
+            <!-- "Open in Zaman" from any OTHER app's own calendar UI (the stock Calendar app,
+                 Gmail's event chip, a car head unit, ...) that fires ACTION_VIEW against the
+                 platform's CalendarContract.Events row for an event — which, for anything
+                 Zaman itself mirrors there (Settings -> "Sync with Android Calendar"), is
+                 exactly the row CalendarContractRepository wrote. ZamanNavHost resolves the
+                 numeric event id in the URI back to Zaman's own href (via Events._SYNC_ID,
+                 same field CalendarContractRepository writes it as) before navigating — see its
+                 own doc comment. This makes Zaman an option in the system's "complete action
+                 using" chooser for calendar events; Android has no single "set as default
+                 calendar app" role the way it does for browsers/SMS, so this intent-filter is
+                 the actual mechanism behind that request. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:scheme="content"
+                    android:host="com.android.calendar"
+                    android:pathPrefix="/events" />
+            </intent-filter>
+        </activity>
+
+        <!-- Login Flow v2 redirect catcher, same pattern as Vinci/Tavla/Koto -->
+        <activity
+            android:name=".data.caldav.LoginFlowRedirectActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Zaman">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="zaman" android:host="login-callback" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".reminders.ReminderReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".reminders.BootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Home-screen agenda widget — see widget/ZamanAgendaWidget.kt's doc comment. -->
+        <receiver
+            android:name=".widget.ZamanAgendaWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/zaman_agenda_widget_info" />
+        </receiver>
+
+        <!-- Standard Android widget-configure screen: shown automatically right after the user
+             places (or long-press-reconfigures) the agenda widget, letting that ONE widget
+             instance pick which calendars it shows — separate from the in-app left-hand drawer's
+             global display selection. See ZamanAgendaWidgetConfigureActivity's doc comment. -->
+        <activity
+            android:name=".widget.ZamanAgendaWidgetConfigureActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Zaman">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <!-- Feature #2 — CalendarContract two-way sync. Both services are only ever bound by the
+             OS's own account/sync-adapter machinery (android:exported must be true for that to
+             work), guarded by the standard platform signature permissions below so no other app
+             can bind them directly. -->
+        <service
+            android:name=".sync.contract.AuthenticatorService"
+            android:exported="true"
+            android:permission="android.permission.BIND_AUTHENTICATOR">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+
+        <service
+            android:name=".sync.contract.SyncAdapterService"
+            android:exported="true"
+            android:permission="android.permission.BIND_SYNC_ADAPTER">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
+        </service>
+
+        <!-- Custom WorkManager Configuration.Provider needs the default initializer removed -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+
+    </application>
+
+</manifest>

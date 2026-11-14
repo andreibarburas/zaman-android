@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Classic-View placeholder Android briefly shows before Glance's own RemoteViews composition
+     replaces it — every AppWidgetProviderInfo needs a real android:initialLayout resource, even
+     though this app otherwise has no XML View layouts at all (everything else is Compose). -->
+<ProgressBar xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_loading_progress"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center" />

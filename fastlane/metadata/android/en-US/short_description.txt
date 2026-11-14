@@ -1,0 +1,1 @@
+Privacy-first Nextcloud calendar with smart sync, linked contacts & more.

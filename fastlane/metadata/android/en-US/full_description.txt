@@ -1,0 +1,31 @@
+Zaman is a privacy-first calendar app built for Nextcloud. No ads, no tracking, no cloud lock-in, just your events, synced the way CalDAV was meant to work.
+
+YOUR CALENDARS, YOUR SERVER
+Connect directly to your Nextcloud instance over CalDAV. Zaman syncs your events in the background and keeps a local cache, so your agenda is always available, even offline.
+
+BUILT FOR HOW YOU ACTUALLY PLAN
+Today, Week, and Month views, each designed to stay readable instead of cramped. Color-coded calendars so you can tell your work, family, and personal events apart at a glance. A dedicated event detail screen with the date, time, calendar, location, and attendees laid out clearly. "Protect this time" lets you mark an event as a hard block, and Zaman will warn you before anything gets scheduled over it.
+
+CONNECTED TO THE REST OF YOUR LIFE
+Tap an attendee to see their name and photo pulled straight from your Vinci contacts, not just a bare email address. Tap a location to open navigation in whichever app you actually have installed, not just one specific provider. Calendar colors carry through into event details, so context is never more than a glance away.
+
+MAKE IT YOURS
+Light, dark, and OLED-friendly themes, adjustable text size, and a custom typeface pairing (DM Serif Display + Inter Tight) that gives the app its own character.
+
+NO COMPROMISES ON PRIVACY
+Zaman talks only to your Nextcloud server. Nothing is sent anywhere else, no accounts to create, no analytics running in the background. It's free, open-source, and built for people who want to own their own data.
+
+FEATURES
+- Direct CalDAV sync with your own Nextcloud, no DAVx5/ICSx bridge required
+- Today, Week, and Month views
+- Per-calendar color coding and toggles, including Nextcloud ICS subscriptions
+- Event create, edit, and delete, with recurring events (RRULE)
+- Event reminders, scheduled locally and restored after reboot
+- "Protect this time" hard-block scheduling with conflict warnings
+- Attendee linking to Vinci contacts, with name and photo
+- Tap-to-navigate on event locations, using whichever app is installed
+- Koto (Nextcloud Tasks) due-dates shown in the agenda
+- Tavla (Nextcloud Deck) card due-dates shown in the agenda
+- Biometric lock
+- Light / Dark / OLED themes, adjustable text size
+- Local-only mode with export/import for devices without Nextcloud

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Feature #2 — declares Zaman's stub account type to the OS account system. See
+     ZamanAccount.kt's doc comment: there's no real login UI behind this, it exists only so
+     CalendarContract rows have an account to belong to. -->
+<account-authenticator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accountType="com.brbrs.zaman"
+    android:icon="@mipmap/ic_launcher"
+    android:smallIcon="@mipmap/ic_launcher"
+    android:label="@string/app_name" />

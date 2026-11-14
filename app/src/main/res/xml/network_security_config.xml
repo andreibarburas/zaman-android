@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Plain-HTTP support for private-network Nextcloud instances (Blik pattern). -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+            <!-- Self-hosted Nextcloud behind a self-signed or home-CA cert is the norm for this
+                 suite's audience — without trusting user-installed certs too, every such server
+                 fails the TLS handshake and shows up to the user as a flat "could not reach
+                 that server", indistinguishable from a real connectivity problem. -->
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
